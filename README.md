@@ -11,8 +11,15 @@ Create a bedside lamp that could have a white light at the right temperatures
   is nearby.
 - Using a strip of NEOPIXEL LED's, implement a basic dot-matrix style display
   such that basic information like time can be shown on the lampshade.
+**Extra Ideas**
+- Get time information from Internet/GPS.
 
 ### Features (aka. Side Missions)
+- Use calls to the internet to determine location information, using the   Use this
+  information to determine outside weather/temperature information for display
+  to the user. (Using [encoding.json](https://libs.toit.io/encoding/json/library-summary),
+  [net], [http](https://github.com/toitlang/pkg-http) and
+  [certificate-roots](https://github.com/toitware/toit-cert-roots) libraries.)
 - Implement [INA226](https://github.com/milkmansson/toit-ina226) and
   [INA3221](https://github.com/milkmansson/toit-ina3221) to measure current and
   throughput to determine if operating within design tolerances.
@@ -31,14 +38,18 @@ Create a bedside lamp that could have a white light at the right temperatures
   feature to help as a snooze button to ensure the user is not annoyed by
   hitting the wrong sensor when an alarm happens.
 - Using a pin interrupt, implement an event handler for the
-  [MPR121](https://github.com/milkmansson/toit-mpr121) to assign code to execute
-  on assigned touch channels.
+  [MPR121](https://github.com/milkmansson/toit-mpr121) to assign code for execution
+  when assigned touch channels are triggered.
 - Using an [SSD1306](https://github.com/toitware/toit-ssd1306) to display
   information, implement a [display manager](./src/toit-clock-screen.toit) which
   switches between pages on the display.
 - Use a [BME280](https://github.com/toitware/bme280-driver) to get basic
   environmental information for display to the user.  Potentially do some logging
   to the internet for assistance in assessing the sleep environment.
+- Use a [DS3231](https://github.com/pkarsy/toit-ds3231) to keep time after power
+  off events.  Use the [cat24c32](https://github.com/toitware/toit-cat24c32)
+  driver to store information (such as the timezone) on the small flash module
+  common to many DS3231 modules.
 - **(Optional)** Implement an [MQ2] sensor/smoke detector.  Fires aren't
   expected but for the size of the sensor, and the existence of alarm
   capability, why wouldn't we?
