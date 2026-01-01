@@ -15,10 +15,15 @@ Create a bedside lamp that could have a white light at the right temperatures
 - Get time information from Internet/GPS.
 
 ### Features (aka. Side Missions)
-- Use calls to the internet to determine location information, using the   Use this
-  information to determine outside weather/temperature information for display
-  to the user. (Using [encoding.json](https://libs.toit.io/encoding/json/library-summary),
-  [net], [http](https://github.com/toitlang/pkg-http) and
+- Use NTP to get Time from the internet.  Potentially use a GPS device to get
+  time also, potentially helping with location information for better weather
+  information.
+- Use calls to the internet to determine location information (GeoIP lookup).
+  Use this information to determine outside weather/temperature information for
+  display to the user. (Using
+  [encoding.json](https://libs.toit.io/encoding/json/library-summary),
+  [net](https://libs.toit.io/net/library-summary),
+  [http](https://github.com/toitlang/pkg-http) and
   [certificate-roots](https://github.com/toitware/toit-cert-roots) libraries.)
 - Implement [INA226](https://github.com/milkmansson/toit-ina226) and
   [INA3221](https://github.com/milkmansson/toit-ina3221) to measure current and
