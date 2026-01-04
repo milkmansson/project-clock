@@ -18,17 +18,21 @@ ESP32S3-SCL-PIN := 9
 //ESP32S3-SCL-PIN := 13
 
 device-library/Map     := {
-  0x08:  "HUSB238",
-  0x23 : "BH1750",
-  0x29 : "VL53L0X",
-  0x39 : "APDS9960",
-  0x76 : "BMP280/BME280",
-  0x3c : "SSD1306",
-  0x40 : "INA219- INA226- INA3221-",
-  0x5a : "MPR121- CCS811-",
-  0x68 : "DS3231- MPU6050- ",
-  0x57 : "AT24C32",
-  0x36 : "MAX1704x- AS5600- "
+  0x08: "HUSB238",
+  0x18: "47L16 (Control)",
+  0x23: "BH1750",
+  0x29: "VL53L0X",
+  0x39: "APDS9960",
+  0x76: "BMP280/BME280",
+  0x3c: "SSD1306",
+  0x40: "INA219- INA226- INA3221-",
+  0x50: "47L16 (Data)",
+  0x53: "ENS160",
+  0x5a: "MPR121- CCS811-",
+  0x68: "DS3231- MPU6050- ",
+  0x69: "ICM20948",
+  0x57: "AT24C32",
+  0x36: "MAX1704x- AS5600- "
 }
 
 
@@ -96,24 +100,22 @@ main:
 
   // Test without bus scan for known devices:
   print "  Testing for each of $(device-library.size) known I2C addresses:"
+  count := 0
   device-library.do:
     if bus.test it:
-      print "  - 0x$(%02x it): $(device-library[it])  Device Found"
+      print "  - 0x$(%02x it): $(device-library[it])"
+      count++
   print
 
   // Bus scan to find remainder
-  print "  Bus scan for other devices..."
   devices := bus.scan
-  print
 
-  print "  Devices detected on bus scan:"
-  devices.do:
-    if device-library.contains it:
-      // Already Attempted Explicitly - skip
-      // print "                    - 0x$(%02x it): $(device-library[it])  Device Found"
-    else:
-      print "  - 0x$(%02x it)"
+  if count < devices.size:
+    print "  Other devices detected on bus scan:"
+    devices.do:
+      if not (device-library.contains it):
+        print "  - 0x$(%02x it)"
+    print
 
-  print
   print "  Total: $(devices.size) devices."
   print

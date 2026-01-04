@@ -15,9 +15,9 @@ Create a bedside lamp that could have a white light at the right temperatures
 - Get time information from Internet/GPS.
 
 ### Features (aka. Side Missions)
-- Use NTP to get Time from the internet.  Potentially use a GPS device to get
-  time also, potentially helping with location information for better weather
-  information.
+- Use [NTP](https://github.com/toitlang/pkg-ntp) to get Time from the internet.
+  Potentially use a GPS device to get time also, potentially helping with
+  location information for better weather information.
 - Use calls to the internet to determine location information (GeoIP lookup).
   Use this information to determine outside weather/temperature information for
   display to the user. (Using
@@ -55,6 +55,8 @@ Create a bedside lamp that could have a white light at the right temperatures
   off events.  Use the [cat24c32](https://github.com/toitware/toit-cat24c32)
   driver to store information (such as the timezone) on the small flash module
   common to many DS3231 modules.
+- **(Optional)** Implement [ENS160] and [AHT21] to use as environment monitor/sensor.
+
 - **(Optional)** Implement an [MQ2] sensor/smoke detector.  Fires aren't
   expected but for the size of the sensor, and the existence of alarm
   capability, why wouldn't we?

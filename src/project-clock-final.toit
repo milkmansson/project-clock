@@ -10,7 +10,7 @@ import ntp
 import esp32
 
 import ssd1306 show *
-import dhtxx show *
+//import dhtxx show *
 import bme280
 import ds3231
 import cat24c32
@@ -25,22 +25,23 @@ import pixel-strip                            // WS2812B driver (package)
 
 
 // Device Drivers in development.
-import ..drivers-released.toit-ina226.src.ina226 as ina226
-import ..drivers-released.toit-ina3221.src.ina3221 as ina3221
+import ...drivers-released.toit-ina226.src.ina226 as ina226
+import ...drivers-released.toit-ina3221.src.ina3221 as ina3221
 
 // Experimental Drivers.
-import ..drivers-released.toit-mpr121.src.mpr121 show Mpr121
-import ..drivers-released.toit-mpr121.src.mpr121 show Mpr121Events
-import ..drivers-released.toit-husb238.src.husb238 show Husb238
-import ..drivers-released.toit-eeram.src.eeram show Eeram
-import ..drivers-released.toit-eeram.src.eeram show PersistentMap
+import ...drivers-released.toit-mpr121.src.mpr121 show Mpr121
+import ...drivers-released.toit-mpr121.src.mpr121 show Mpr121Events
+import ...drivers-released.toit-husb238.src.husb238 show Husb238
+import ...drivers-released.toit-eeram.src.eeram show Eeram
+import ...drivers-released.toit-eeram.src.persistentmap show PersistentMap
 
-import ..drivers.toit-pwmledmixer.src.pwmledmixer show PwmLedMixer
-import ..drivers.toit-esp32s3rgbled.src.esp32s3rgbled as esp32s3rgbled
-import ..drivers.toit-timehelper.src.timehelper as timehelper
-import ..drivers.toit-pixel-strip-matrix.src.pixel-strip-matrix show PixelStripMatrix
+import ...drivers.toit-pwmledmixer.src.pwmledmixer show PwmLedMixer
+import ...drivers.toit-esp32s3rgbled.src.esp32s3rgbled as esp32s3rgbled
+import ...drivers.toit-timehelper.src.timehelper as timehelper
+import ...drivers.toit-pixel-strip-matrix.src.pixel-strip-matrix show PixelStripMatrix
 
-import .clock-screen as clock-screen
+import .project-clock-screen as clock-screen
+import .project-clock-weather as clock-weather
 
 import font show *
 import font-x11-adobe.sans-10
@@ -51,23 +52,20 @@ import font-x11-adobe.typewriter-08
 import font-tiny.tiny
 import font-tiny.tiny-bigger-digits
 
-
-
-
 import pixel-strip show *                            // WS2812B driver (package)
 
-// Touch sensor driver and preparation.
-TOUCH-INTRPT-PIN ::= 33
-
 // Top I2C channel.
-UPPER-SDA-PIN ::= 14
-UPPER-SCL-PIN ::= 13
+UPPER-SDA-PIN-NUMBER ::= 14
+UPPER-SCL-PIN-NUMBER ::= 13
 UPPER-BUS-FREQUENCY ::= 400_000
 
 // Lower I2C channel.
-LOWER-SDA-PIN ::= 8
-LOWER-SCL-PIN ::= 9
+LOWER-SDA-PIN-NUMBER ::= 8
+LOWER-SCL-PIN-NUMBER ::= 9
 LOWER-BUS-FREQUENCY ::= 400_000
+
+// Touch sensor driver and preparation.
+TOUCH-INTRPT-PIN ::= 18
 
 // White light channels.
 COOL-CHANNEL-PIN  ::= 5
@@ -87,9 +85,6 @@ STATUS-PIXEL-PIN := 38
 // Default Timezone.
 //TIMEZONE-POSIX-CODE := "GMT0BST,M3.5.0/1,M10.5.0"
 
-// MPR121 INT pin.
-MPR121-INTERRUPT-PIN := 18
-
 // Devices: UPPER-BUS
 //  - 0x76: BME280
 //  - 0x3c: SSD1306
@@ -99,15 +94,25 @@ MPR121-INTERRUPT-PIN := 18
 //  - 0x38:
 //  - 0x53:
 
-// Devices:
+// Devices: LOWER-BUS
+//  - 0x08: HUSB238
+//  - 0x18: 47L16 (Control)
 //  - 0x40: INA226
 //  - 0x41: INA3221
 INA3221-I2C-ADDRESS-ALT  ::= 0x41
-//  - 0x08: HUSB238
+//  - 0x50: 47L16 (Data)
 
-settings-pmap := ?
+pmap := ?
 
 pd-voltage/bool := false
+
+// Testing device pin changes (if necessary)
+TEST-ESP32-MAC := #[0x98,0xA3,0x16,0xEB,0xE0,0x5C]
+TEST-UPPER-SDA-PIN-NUMBER ::= 19
+TEST-UPPER-SCL-PIN-NUMBER ::= 20
+TEST-LOWER-SDA-PIN-NUMBER ::= LOWER-SDA-PIN-NUMBER
+TEST-LOWER-SCL-PIN-NUMBER ::= LOWER-SCL-PIN-NUMBER
+TEST-TOUCH-INTRPT-PIN     ::= 42
 
 main:
   print
@@ -117,20 +122,34 @@ main:
   logger := log.default.with-name "clock"
   logger.with-level log.DEBUG-LEVEL
 
+  // Prep vars, determine if test device or not, assign pins as necessary.
+  upper-sda-pin-number := UPPER-SDA-PIN-NUMBER
+  upper-scl-pin-number := UPPER-SCL-PIN-NUMBER
+  lower-sda-pin-number := LOWER-SDA-PIN-NUMBER
+  lower-scl-pin-number := LOWER-SCL-PIN-NUMBER
+  touch-interrupt-pin-number := TOUCH-INTRPT-PIN
+
+  if esp32.mac-address == TEST-ESP32-MAC:
+    logger.warn "switching i2c bus pins for TEST platform"
+    upper-sda-pin-number = TEST-UPPER-SDA-PIN-NUMBER
+    upper-scl-pin-number = TEST-UPPER-SCL-PIN-NUMBER
+    lower-sda-pin-number = TEST-LOWER-SDA-PIN-NUMBER
+    lower-scl-pin-number = TEST-LOWER-SCL-PIN-NUMBER
+    touch-interrupt-pin-number = TEST-TOUCH-INTRPT-PIN
+
   // Upper Bus I2C Setup.
-  logger.info "establishing UPPER i2c bus"
-  upper-sda-pin := gpio.Pin UPPER-SDA-PIN
-  upper-scl-pin := gpio.Pin UPPER-SCL-PIN
+  logger.info "establishing UPPER i2c bus" --tags={"sda":upper-sda-pin-number, "scl":upper-scl-pin-number, "freq":UPPER-BUS-FREQUENCY}
+  upper-sda-pin := gpio.Pin upper-sda-pin-number --pull-up
+  upper-scl-pin := gpio.Pin upper-scl-pin-number --pull-up
   upper-bus := i2c.Bus --sda=upper-sda-pin --scl=upper-scl-pin --frequency=UPPER-BUS-FREQUENCY
   upper-devices := upper-bus.scan
 
   // Lower Bus I2C Setup.
-  logger.info "establishing LOWER i2c bus"
-  lower-sda-pin := gpio.Pin LOWER-SDA-PIN
-  lower-scl-pin := gpio.Pin LOWER-SCL-PIN
+  logger.info "establishing LOWER i2c bus" --tags={"sda":lower-sda-pin-number, "scl":lower-scl-pin-number, "freq":LOWER-BUS-FREQUENCY}
+  lower-sda-pin := gpio.Pin lower-sda-pin-number
+  lower-scl-pin := gpio.Pin lower-scl-pin-number
   lower-bus := i2c.Bus --sda=lower-sda-pin --scl=lower-scl-pin --frequency=LOWER-BUS-FREQUENCY
   lower-devices := lower-bus.scan
-
 
   // PD trigger device (lower bus).
   husb238-device   := null
@@ -170,7 +189,7 @@ main:
     eeram-controller-device = lower-bus.device Eeram.I2C-CONTROL-ADDRESS
 
   if eeram-data-device and eeram-controller-device:
-    settings-pmap = PersistentMap
+    pmap = PersistentMap
         --control=eeram-controller-device
         --data=eeram-data-device
         --capacity=Eeram.CAPACITY-16KBIT
@@ -202,8 +221,15 @@ main:
 
     // Screen Helper
     screen-helper = clock-screen.ScreenHelper ssd1306-display --logger=logger
-    //screen-helper.keep-screen-updated
+    screen-helper.add-device "MEMORY"
+    screen-helper.add-device "SYSTEM"
     sleep --ms=100
+
+    // weather Helper
+    weather-helper := clock-weather.WeatherHelper --pmap=pmap --logger=logger
+    weather-helper.keep-location-updated
+    weather-helper.keep-weather-updated
+    screen-helper.add-device weather-helper
 
   // Environment Sensor device.
   bme280-device                := null
@@ -256,10 +282,8 @@ main:
     mpr121-device  = upper-bus.device Mpr121.I2C-ADDRESS-5a
     mpr121-driver  = Mpr121 mpr121-device --logger=logger
 
-    //mpr121-driver.debug-touched
-
     mpr121-events = Mpr121Events mpr121-driver
-        --intrpt-pin=(gpio.Pin MPR121-INTERRUPT-PIN)
+        --intrpt-pin=(gpio.Pin touch-interrupt-pin-number)
 
     sleep --ms=100
 
@@ -324,16 +348,16 @@ main:
 
 
   if mpr121-events:
-    mpr121-events.on-press Mpr121Events.CHANNEL-01 --callback=(:: toggle-brightness cct-strip)
+    mpr121-events.on-touch Mpr121Events.CHANNEL-01 --callback=(:: toggle-brightness cct-strip)
     if screen-helper:
-      mpr121-events.on-press Mpr121Events.CHANNEL-11 --callback=(:: screen-helper.next-screen)
-      mpr121-events.on-press Mpr121Events.CHANNEL-10 --callback=(:: cct-strip.swipe --cycle-ms=10_000)
+      mpr121-events.on-touch Mpr121Events.CHANNEL-11 --callback=(:: screen-helper.next-screen)
+      mpr121-events.on-touch Mpr121Events.CHANNEL-10 --callback=(:: cct-strip.swipe --cycle-ms=10_000)
       //mpr121-events.on-press Mpr121Events.CHANNEL-10 --callback=(:: led-time-on pixel-display-col)
       //mpr121-events.on-release Mpr121Events.CHANNEL-01  --callback=(:: toggle-brightness cct-strip)
 
 
-      mpr121-events.on-press Mpr121Events.CHANNEL-02 --callback=(:: leds-on pixel-strip total-pixels)
-      mpr121-events.on-press Mpr121Events.CHANNEL-03 --callback=(:: leds-off pixel-strip total-pixels)
+      mpr121-events.on-touch Mpr121Events.CHANNEL-02 --callback=(:: leds-on pixel-strip total-pixels)
+      mpr121-events.on-touch Mpr121Events.CHANNEL-03 --callback=(:: leds-off pixel-strip total-pixels)
 
 
 
