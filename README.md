@@ -38,7 +38,7 @@ Create a bedside lamp that could have a white light at the right temperatures
   from browning out the whole system if/when a non-PD capable charger (or simply, insufficient power) is available.
 - Implement [47L16](https://github.com/milkmansson/toit-eeram) flash-backed
   EERAM chip to save information and other settings, to be persistent across
-  reboots.  This would be more easily possible using Toit storage [Buckets] (https://libs.toit.io/system/storage/library-summary) but I was worried about causing wear on ESP32 onboard flash, and had some of these available from another project.
+  reboots.  This would be more easily possible using Toit storage [Buckets](https://libs.toit.io/system/storage/library-summary) but I was worried about causing wear on ESP32 onboard flash, and had some of these available from another project.
 - Implement two [PWM](https://docs.toit.io/tutorials/hardware/pwm-led) drivers
   to control the CCT strip.  Implement a [library] to perform basic control of
   white balance, and include gamma correction.
