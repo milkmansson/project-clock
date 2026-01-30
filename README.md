@@ -12,6 +12,7 @@ Create a bedside lamp that could have a white light at the right temperatures
   is nearby.
 - Using a strip of NEOPIXEL LED's, implement a basic dot-matrix style display
   such that basic information like time can be shown on the lampshade.
+- Prove that current commercially available products of this nature are over priced, under developed and under featured, whilst giving the power and flexibility to users to make a device to suit their use cases. 
 
 **Extra Ideas**
 - Get time information from Internet/GPS.
