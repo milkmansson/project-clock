@@ -63,10 +63,10 @@ Create a bedside lamp that could have a white light at the right temperatures
   use as environment monitor/sensor.
 
 #### Incomplete side missions:
-- Use a GPS get time.  Potentially use this information to help with
-  determining location for better weather information.  (Several projects
-  related to this, including this Toit [NMEA Message Parser](https://github.com/milkmansson/toit-nmea-message)
-  and/or Toit's [uBlox GNSS driver](https://github.com/toitware/ublox-gnss-driver)). Refine the method to abstract technicalities of Timing Pins etc away from users. 
+- Use a GPS to get the system time.  Potentially use this information to help with
+  determining location for better weather information (especially if GEOIP data is not accurate enough).  There are several projects
+  related to this, including this Toit [NMEA Message Parser](https://github.com/milkmansson/toit-nmea-message) under development, 
+  and/or Toit's [uBlox GNSS driver](https://github.com/toitware/ublox-gnss-driver)).  For time sync, refine the method to abstract technicalities like Timing Pins etc away from users, or where cheaper modules without timing pins are used. 
 - Implement an [MQ2] sensor/smoke detector.  Fires aren't
   expected but for the size of the sensor, and the existence of alarm
   capability, why wouldn't we?
