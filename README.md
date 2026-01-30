@@ -15,9 +15,11 @@ Create a bedside lamp that could have a white light at the right temperatures
 - Get time information from Internet/GPS.
 
 ### Features (aka. Side Missions)
+- Implement an event handler to take alarm clock events from a phone alarm clock
+  application. [Sleep-as-android](https://github.com/milkmansson/toit-sleep-as-android)
+  MQTT event library.  Implement any smart alerts/features/capabilities from the
+  app such as gradual fade up of lights, actions for snoring detection, etc.
 - Use [NTP](https://github.com/toitlang/pkg-ntp) to get Time from the internet.
-  Potentially use a GPS device to get time also, potentially helping with
-  location information for better weather information.
 - Use calls to the internet to determine location information (GeoIP lookup).
   Use this information to determine outside weather/temperature information for
   display to the user. (Using
@@ -55,7 +57,13 @@ Create a bedside lamp that could have a white light at the right temperatures
   off events.  Use the [cat24c32](https://github.com/toitware/toit-cat24c32)
   driver to store information (such as the timezone) on the small flash module
   common to many DS3231 modules.
-- **(Optional)** Implement [ENS160] and [AHT21] to use as environment monitor/sensor.
+- Implement [ENS160](https://github.com/milkmansson/toit-ens16x) and [AHT21] to
+  use as environment monitor/sensor.
+- Use a GPS get time also.  Potentially use this information to help with
+  determining location for better weather information.  (Several projects
+  related to this, including this Toit [NMEA Message Parser](https://github.com/milkmansson/toit-nmea-message)
+  and/or Toit's [uBlox GNSS driver](https://github.com/toitware/ublox-gnss-driver))
+
 
 - **(Optional)** Implement an [MQ2] sensor/smoke detector.  Fires aren't
   expected but for the size of the sensor, and the existence of alarm
