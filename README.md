@@ -5,20 +5,21 @@ other features.
 ## Mission
 Create a bedside lamp that could have a white light at the right temperatures
 (cool/warm) to assist with waking and sleeping.
-- Allow on/off/light temperature control
-- Implement a sleep function
+- Allow on/off/light temperature control of a CCT LED strip.
+- Implement a sleep function, to keep the light on and fade when the user drifts off to sleep. 
 - Use a sensor to determine if someone is there.. disable/mute alarms if nobody
   is nearby.
 - Using a strip of NEOPIXEL LED's, implement a basic dot-matrix style display
   such that basic information like time can be shown on the lampshade.
+
 **Extra Ideas**
 - Get time information from Internet/GPS.
+- Implement this over BT/BLE.  Allow arbitrary sensor data to become available to phone apps. 
 
 ### Features (aka. Side Missions)
 - Implement an event handler to take alarm clock events from a phone alarm clock
-  application. [Sleep-as-android](https://github.com/milkmansson/toit-sleep-as-android)
-  MQTT event library.  Implement any smart alerts/features/capabilities from the
-  app such as gradual fade up of lights, actions for snoring detection, etc.
+  application. An MQTT wrapper was written to support the [Sleep-as-android](https://github.com/milkmansson/toit-sleep-as-android) app.  Implement any smart alerts/features/capabilities from the
+  app such as gradual fade up of lights, actions for snoring detection, etc.  (To do: Find alternative method for Apple devotees, as Apple don't appear to like MQTT.) 
 - Use [NTP](https://github.com/toitlang/pkg-ntp) to get Time from the internet.
 - Use calls to the internet to determine location information (GeoIP lookup).
   Use this information to determine outside weather/temperature information for
@@ -33,10 +34,10 @@ Create a bedside lamp that could have a white light at the right temperatures
 - Implement [HUSB238](https://github.com/milkmansson/toit-husb238) - USB-C PD
   trigger to try and get the best wattage out of the available power supplies.
   Use information from the device to take action to prevent LED power draw
-  from browning out the whole system if/when insufficient power is available.
+  from browning out the whole system if/when a non-PD capable charger (or simply, insufficient power) is available.
 - Implement [47L16](https://github.com/milkmansson/toit-eeram) flash-backed
   EERAM chip to save information and other settings, to be persistent across
-  reboots without causing wear on ESP32 onboard flash.
+  reboots.  This would be more easily possible using Toit storage [Buckets] (https://libs.toit.io/system/storage/library-summary) but I was worried about causing wear on ESP32 onboard flash, and had some of these available from another project.
 - Implement two [PWM](https://docs.toit.io/tutorials/hardware/pwm-led) drivers
   to control the CCT strip.  Implement a [library] to perform basic control of
   white balance, and include gamma correction.
