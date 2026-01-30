@@ -6,7 +6,8 @@ other features.
 Create a bedside lamp that could have a white light at the right temperatures
 (cool/warm) to assist with waking and sleeping.
 - Allow on/off/light temperature control of a CCT LED strip.
-- Implement a sleep function, to keep the light on and fade when the user drifts off to sleep. 
+- Allow interaction with the clock to send a message to the phone and tell it to snooze an alarm. 
+- Implement a sleep function, to keep the light on.  Fade the light or turn off when the user drifts off to sleep. 
 - Use a sensor to determine if someone is there.. disable/mute alarms if nobody
   is nearby.
 - Using a strip of NEOPIXEL LED's, implement a basic dot-matrix style display
@@ -60,12 +61,14 @@ Create a bedside lamp that could have a white light at the right temperatures
   common to many DS3231 modules.
 - Implement [ENS160](https://github.com/milkmansson/toit-ens16x) and [AHT21] to
   use as environment monitor/sensor.
-- Use a GPS get time also.  Potentially use this information to help with
+
+#### Incomplete side missions:
+- Use a GPS get time.  Potentially use this information to help with
   determining location for better weather information.  (Several projects
   related to this, including this Toit [NMEA Message Parser](https://github.com/milkmansson/toit-nmea-message)
-  and/or Toit's [uBlox GNSS driver](https://github.com/toitware/ublox-gnss-driver))
-
-
-- **(Optional)** Implement an [MQ2] sensor/smoke detector.  Fires aren't
+  and/or Toit's [uBlox GNSS driver](https://github.com/toitware/ublox-gnss-driver)). Refine the method to abstract technicalities of Timing Pins etc away from users. 
+- Implement an [MQ2] sensor/smoke detector.  Fires aren't
   expected but for the size of the sensor, and the existence of alarm
   capability, why wouldn't we?
+- Package everything together such that a user could build one of these from start to finish
+
