@@ -2,34 +2,42 @@
 A bedside clock project, featuring CCT LED strip to assist with waking, and
 other features.
 
+> [!INFORMATION]
+> ### Project Status
+> 12 Feb 26: Project going slowly whilst I'm travelling without my development tools and
+> hardware being available.
+
 ## Mission
 Create a bedside lamp that could have a white light at the right temperatures
-(cool/warm) to assist with waking and sleeping.
+(cool/warm) to assist with waking and sleeping, especially for someone who lives
+with very little daylight in the depth of wintertime.
 - Allow on/off/light temperature control of a CCT LED strip.
-- Allow interaction with the clock to send a message to the phone and tell it to snooze an alarm. 
-- Implement a sleep function, to keep the light on.  Fade the light or turn off when the user drifts off to sleep. 
-- Use a sensor to determine if someone is there.. disable/mute alarms if nobody
-  is nearby.
+- Allow interaction with the clock to send a message to the phone and tell it to snooze an alarm.
+- Implement a sleep function, to keep the light on.  Fade the light or turn off when the user drifts off to sleep.
+- Use a sensor to determine if someone is there..  allow alarms to be disabled/
+muted alarms if nobody is nearby.
 - Using a strip of NEOPIXEL LED's, implement a basic dot-matrix style display
-  such that basic information like time can be shown on the lampshade.
-- Prove that current commercially available products of this nature are over priced, under developed and under featured, whilst giving the power and flexibility to users to make a device to suit their use cases. 
+such that basic information like time can be shown on the lampshade.
+- Prove that current commercially available products of this nature are over priced, under developed and under featured, whilst giving the power and flexibility to users to make a device to suit their use cases.
 
 **Extra Ideas**
-- Get time information from Internet/GPS.
-- Implement this over BT/BLE.  Allow arbitrary sensor data to become available to phone apps. 
+- Get time information from Internet.
+- Get time information from GPS.
 
-### Features (aka. Side Missions)
+### Completed Features (aka. Side Missions)
 - Implement an event handler to take alarm clock events from a phone alarm clock
-  application. An MQTT wrapper was written to support the [Sleep-as-android](https://github.com/milkmansson/toit-sleep-as-android) app.  Implement any smart alerts/features/capabilities from the
-  app such as gradual fade up of lights, actions for snoring detection, etc.  (To do: Find alternative method for Apple devotees, as Apple don't appear to like MQTT.) 
+  application.
+  - Write an MQTT wrapper to support the [Sleep-as-android](https://github.com/milkmansson/toit-sleep-as-android) app.
+  - Implement any smart alerts/features/capabilities from the app such as
+  gradual fade up of lights, actions for snoring detection, etc.
 - Use [NTP](https://github.com/toitlang/pkg-ntp) to get Time from the internet.
 - Use calls to the internet to determine location information (GeoIP lookup).
   Use this information to determine outside weather/temperature information for
-  display to the user. (Using
+  display to the user. (Using Toit packages
   [encoding.json](https://libs.toit.io/encoding/json/library-summary),
   [net](https://libs.toit.io/net/library-summary),
   [http](https://github.com/toitlang/pkg-http) and
-  [certificate-roots](https://github.com/toitware/toit-cert-roots) libraries.)
+  [certificate-roots](https://github.com/toitware/toit-cert-roots).)
 - Implement [INA226](https://github.com/milkmansson/toit-ina226) and
   [INA3221](https://github.com/milkmansson/toit-ina3221) to measure current and
   throughput to determine if operating within design tolerances.
@@ -55,21 +63,28 @@ Create a bedside lamp that could have a white light at the right temperatures
   switches between pages on the display.
 - Use a [BME280](https://github.com/toitware/bme280-driver) to get basic
   environmental information for display to the user.  Potentially do some logging
-  to the internet for assistance in assessing the sleep environment.
+  to the internet for assistance in assessing the sleep environment.  Implement alternatives such as [ENS160](https://github.com/milkmansson/toit-ens16x) and
+  adapt test [AHT20](https://github.com/davidlao2k/aht20-driver) for the AHT21.
 - Use a [DS3231](https://github.com/pkarsy/toit-ds3231) to keep time after power
   off events.  Use the [cat24c32](https://github.com/toitware/toit-cat24c32)
   driver to store information (such as the timezone) on the small flash module
-  common to many DS3231 modules.
-- Implement [ENS160](https://github.com/milkmansson/toit-ens16x) and [AHT21] to
-  use as environment monitor/sensor.
+  common to many DS3231 modules.  Implement a PR for DS3231 Alarm capabilities.
+
 
 #### Incomplete side missions:
-- Use a GPS to get the system time.  Potentially use this information to help with
-  determining location for better weather information (especially if GEOIP data is not accurate enough).  There are several projects
-  related to this, including this Toit [NMEA Message Parser](https://github.com/milkmansson/toit-nmea-message) under development, 
-  and/or Toit's [uBlox GNSS driver](https://github.com/toitware/ublox-gnss-driver)).  For time sync, refine the method to abstract technicalities like Timing Pins etc away from users, or where cheaper modules without timing pins are used. 
+- Implement BT/BLE capabilities:
+  - Allow arbitrary sensor data to become available to phone apps.
+  - Allow configuration, eg, WiFi credentials, via BT/BLE, to prevent needing
+    to mess with code in order to attach to a new WiFi AP.
+- Use a GPS to get the system time.  Potentially use this information to help
+  with determining location for better weather information (especially if GEOIP
+  data is not accurate enough).
+  - There are several projects related to this, including this Toit [NMEA Message Parser](https://github.com/milkmansson/toit-nmea-message),
+  and/or Toit's [uBlox GNSS driver](https://github.com/toitware/ublox-gnss-driver)).
+  - For time sync, refine the method to abstract technicalities like Timing Pins
+  etc away from users, or for where cheaper modules without timing pins are used.
 - Implement an [MQ2] sensor/smoke detector.  Fires aren't
   expected but for the size of the sensor, and the existence of alarm
   capability, why wouldn't we?
-- Package everything together such that a user could build one of these from start to finish
-
+- Package everything together such that a user could build one of these from start to finish.
+- Find alternative method for Apple devotees, as Apple don't appear to like MQTT.
