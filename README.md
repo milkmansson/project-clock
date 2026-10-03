@@ -46,7 +46,7 @@ The electronics of this prototype live inside the base of an off-the-shelf table
 
 ## How BLE is used
 
-The lamp is a BLE peripheral. It advertises as `OKK Lamp` and offers three small services, all described in [`docs/ble-gatt-spec.md`](docs/ble-gatt-spec.md):
+The lamp is a BLE peripheral. It advertises as `OKK Lamp` and offers three small services, all described in [`BLE Protocol Reference`](docs/ble-protocol-reference.md):
 
 | Service | What it carries |
 |---|---|
