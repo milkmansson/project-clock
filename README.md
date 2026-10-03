@@ -42,7 +42,7 @@ The electronics of this prototype live inside the base of an off-the-shelf table
 - [If allowed] - the device will also take control directly from the *Sleep as Android* app without the app included in this repository.
 
 > [!CAUTION]
-> **Not 100% decided:** The app does not need *Sleep as Android* to run the lamp, but it was originally designed to be a companion device to this app.  Turn on Sleep's **Intent API** setting and the app hears when an alarm is rescheduled or snoozed, and gives the required information to the Lamp.  Once the Lamp has that information, the **lamp** can start the sunrise independently of the phone using its own internal clock - in this way a dropped Bluetooth link overnight still allows the light ramp up to function.
+> **Not 100% decided:** The app does not need *Sleep as Android* to run the lamp, however, the lamp was originally designed to be a companion device to *Sleep as Android*, and to not need an app of its own.  To combine these, turn on *Sleep as Android*'s' **Intent API** setting to have the 'OKK Lamp' app hear when an alarm is rescheduled or snoozed etc, so it can gives the required instructions to the Lamp.  Once the Lamp has those instructions, the **lamp** can start the sunrise/ramp up independently of the phone, by using its own internal clock.  In this way a dropped Bluetooth link overnight still allows the light ramp up to function.
 
 ## How BLE is used
 
