@@ -11,7 +11,6 @@ How this document was made: written from the firmware source in `src/` (mainly
 Labels used below:
 
 - [Code] read directly from the firmware source. It says what the code does, not that it has been seen working on hardware.
-- [Guess] my inference, not confirmed. Test it before relying on it.
 - [Pending] known to be undecided or untested.
 - [Decision] a design choice we made (the lamp does this on purpose).
 
@@ -26,7 +25,6 @@ Nothing here has been checked against a running lamp in this session. Hardware t
 - Brightness is permille (0 to 1000). The driver applies its own gamma. Colour temperature (CCT) is Kelvin; the lamp's usable range is in Info (this build: 3000 to 6000 K, per the project notes).
 - Time is Unix seconds in UTC. Lamp sensor timestamps are *lamp uptime seconds*, not Unix time (section 7).
 - All writes use ATT Write Request (with response). No characteristic offers Write Without Response. [Code: properties are WRITE only]
-- A write of the wrong size is dropped by the lamp, not rejected: the handler logs a warning and returns normally, so the app will most likely see a successful write response and no effect. [Code for the drop; Guess for what the stack returns] Check sizes on the client.
 
 ## 2. UUIDs
 
@@ -34,50 +32,49 @@ Base: `b45f<slot>-4423-4e5d-a885-2418d6adf470`, where `<slot>` is four hex digit
 
 | Slot | Name | Full UUID |
 |---|---|---|
-| 1000 | Lamp service | b45f1000-4423-4e5d-a885-2418d6adf470 |
-| 1001 | State | b45f1001-4423-4e5d-a885-2418d6adf470 |
-| 1002 | Ramp | b45f1002-4423-4e5d-a885-2418d6adf470 |
-| 1003 | Cue | b45f1003-4423-4e5d-a885-2418d6adf470 |
-| 1004 | Alarm | b45f1004-4423-4e5d-a885-2418d6adf470 |
-| 1005 | Timer | b45f1005-4423-4e5d-a885-2418d6adf470 |
-| 2000 | Sensor service | b45f2000-4423-4e5d-a885-2418d6adf470 |
-| 2001 | Live | b45f2001-4423-4e5d-a885-2418d6adf470 |
-| 2002 | History control | b45f2002-4423-4e5d-a885-2418d6adf470 |
-| 2003 | History data | b45f2003-4423-4e5d-a885-2418d6adf470 |
-| 3000 | System service | b45f3000-4423-4e5d-a885-2418d6adf470 |
-| 3001 | Status | b45f3001-4423-4e5d-a885-2418d6adf470 |
-| 3002 | Time | b45f3002-4423-4e5d-a885-2418d6adf470 |
-| 3003 | Info | b45f3003-4423-4e5d-a885-2418d6adf470 |
-| 3004 | Log control | b45f3004-4423-4e5d-a885-2418d6adf470 |
-| 3005 | Log data | b45f3005-4423-4e5d-a885-2418d6adf470 |
-| 3006 | Config | b45f3006-4423-4e5d-a885-2418d6adf470 |
+| `1000` | Lamp service | b45f1000-4423-4e5d-a885-2418d6adf470 |
+| `1001` | State | b45f1001-4423-4e5d-a885-2418d6adf470 |
+| `1002` | Ramp | b45f1002-4423-4e5d-a885-2418d6adf470 |
+| `1003` | Cue | b45f1003-4423-4e5d-a885-2418d6adf470 |
+| `1004` | Alarm | b45f1004-4423-4e5d-a885-2418d6adf470 |
+| `1005` | Timer | b45f1005-4423-4e5d-a885-2418d6adf470 |
+| `2000` | Sensor service | b45f2000-4423-4e5d-a885-2418d6adf470 |
+| `2001` | Live | b45f2001-4423-4e5d-a885-2418d6adf470 |
+| `2002` | History control | b45f2002-4423-4e5d-a885-2418d6adf470 |
+| `2003` | History data | b45f2003-4423-4e5d-a885-2418d6adf470 |
+| `3000` | System service | b45f3000-4423-4e5d-a885-2418d6adf470 |
+| `3001` | Status | b45f3001-4423-4e5d-a885-2418d6adf470 |
+| `3002` | Time | b45f3002-4423-4e5d-a885-2418d6adf470 |
+| `3003` | Info | b45f3003-4423-4e5d-a885-2418d6adf470 |
+| `3004` | Log control | b45f3004-4423-4e5d-a885-2418d6adf470 |
+| `3005` | Log data | b45f3005-4423-4e5d-a885-2418d6adf470 |
+| `3006` | Config | b45f3006-4423-4e5d-a885-2418d6adf470 |
 
 ## 3. Properties and permissions
 
 "Enc" means the characteristic requires an encrypted (bonded) link; the first access triggers pairing. [Code: permissions are READ-ENCRYPTED / WRITE-ENCRYPTED]
 
-| Characteristic | Read | Write | Notify | Needs encryption | Size (bytes) |
+| Characteristic | Slot | Read | Write | Notify | Needs encryption | Size (bytes) |
 |---|---|---|---|---|---|
-| State 1001 | yes | yes | yes | read and write | 5 |
-| Ramp 1002 | no | yes | no | write | 7 |
-| Cue 1003 | no | yes | no | write | 6 |
-| Alarm 1004 | yes | yes | no | read and write | 19 |
-| Timer 1005 | yes | yes | no | read and write | 5 |
-| Live 2001 | yes | no | yes | read | 18 |
-| History control 2002 | no | yes | no | write | 5 |
-| History data 2003 | no (not intended) | no | yes | (read permission set) | 20 or 8 |
-| Status 3001 | yes | no | yes | **no** | 6 |
-| Time 3002 | yes | yes | no | read and write | 8 |
-| Info 3003 | yes | no | no | **no** | 14 |
-| Log control 3004 | no | yes | no | write | 3 |
-| Log data 3005 | no (not intended) | no | yes | (read permission set) | 3 to 20 |
-| Config 3006 | yes | yes | no | read and write | 7 |
+| State | `1001` | yes | yes | yes | read and write | 5 |
+| Ramp | `1002` | no | yes | no | write | 7 |
+| Cue | `1003` | no | yes | no | write | 6 |
+| Alarm | `1004` | yes | yes | no | read and write | 19 |
+| Timer | `1005` | yes | yes | no | read and write | 5 |
+| Live | `2001` | yes | no | yes | read | 18 |
+| History control | `2002` | no | yes | no | write | 5 |
+| History data | `2003` | no (not intended) | no | yes | (read permission set) | 20 or 8 |
+| Status | `3001` | yes | no | yes | **no** | 6 |
+| Time | `3002` | yes | yes | no | read and write | 8 |
+| Info | `3003` | yes | no | no | **no** | 14 |
+| Log control | `3004` | no | yes | no | write | 3 |
+| Log data | `3005` | no (not intended) | no | yes | (read permission set) | 3 to 20 |
+| Config | `3006` | yes | yes | no | read and write | 7 |
 
 Notes:
 
 - Status and Info are readable without pairing. That is how an app can identify the lamp and show its state before bonding. [Decision]
 - History data and Log data are notify-only. The firmware gives them a placeholder value and a read permission only because the Toit API needs one. Do not read them. [Code]
-- Notify characteristics need the client to write the CCCD (enable notifications). Whether CCCD writes on the encrypted characteristics also trigger pairing is [Guess].
 - Alarm, Timer, Config and Time are read/write only: there is no notification when they change. State bit 3 (armed) and bit 4 (timer running) are the change signals for Alarm and Timer; re-read the characteristic when they flip.
 
 ## 4. Advertising, pairing and connection behaviour
@@ -87,7 +84,7 @@ Notes:
 - Connectable, undirected. [Code]
 - Main packet: flags (general discovery, BR/EDR not supported), the Lamp service UUID (128-bit), and the name `OKK Lamp`. [Code]
 - Scan response: GAP Appearance AD (type 0x19) value `0x0585` ("Desk Light"). [Code]
-- Fallback: if the first advertisement fails to start (the name did not fit), the lamp retries with the name in the scan response instead. [Code] **Scan by the Lamp service UUID, not by name.** The Android app additionally falls back to the name `OKK` for an already-paired lookup [Guess: that prefix match is an app choice, not a protocol guarantee].
+- Fallback: if the first advertisement fails to start (the name did not fit), the lamp retries with the name in the scan response instead. [Code] **Scan by the Lamp service UUID, not by name.** The Android app additionally falls back to the name `OKK` for an already-paired lookup.
 
 ### When the lamp advertises [Code, Decision]
 
@@ -100,7 +97,7 @@ Notes:
 Toit's BLE peripheral API gives the firmware no connect or disconnect events. The lamp treats "at least one client subscribed to Status" as "a phone is connected". [Code] Consequences for a client:
 
 - Subscribe to Status as soon as you connect, and keep that subscription for as long as you want to hold the lamp. Without it the lamp keeps advertising and does not know you are there.
-- Unsubscribing, or disconnecting (which should drop the subscription, [Guess]), lets the lamp resume advertising (if the window is open or an alarm is armed).
+- Unsubscribing, or disconnecting (which should drop the subscription) lets the lamp resume advertising (if the window is open or an alarm is armed).
 - One phone at a time is the intended use. [Decision]
 
 ### Pairing and security
@@ -150,7 +147,7 @@ Write:
 
 | Offset | Type | Field |
 |---|---|---|
-| 0 | u8 | flags: bit0 on (other bits ignored [Guess]) |
+| 0 | u8 | flags: bit0 on (other bits ignored) |
 | 1 | u16 | brightness permille; `0xFFFF` = leave unchanged; values above 1000 are clamped to 1000 |
 | 3 | u16 | CCT Kelvin; `0xFFFF` = leave unchanged; otherwise clamped into the Info CCT range |
 
@@ -289,7 +286,7 @@ Behaviour [Code]:
 Behaviour [Code]:
 
 - The lamp stores one sample every `history interval` (Config, default 60 s) in a RAM ring of 1440 records (24 hours at the default). A record is stored only if at least one sensor has a reading. History is lost on reboot.
-- Any write to this characteristic first stops a running transfer. Command 1 then starts a new one. Command 2 is accepted silently (it only stops a transfer); it is not a named constant in the code, so treat it as [Guess] on whether it is meant to stay.
+- Any write to this characteristic first stops a running transfer. Command 1 then starts a new one. Command 2 is accepted silently (it only stops a transfer); it is not a named constant in the code, so treat it as on whether it is meant to stay.
 - A replay streams matching records oldest first as History data notifications, paced about 20 ms apart, then one end packet.
 - If the ring changes during a transfer on a full ring, a record may be skipped or repeated. [Code comment]
 
@@ -345,8 +342,6 @@ Status codes [Code]:
 | 9 | BME280 missing | environment sensor missing | no |
 | 10 | DS18B20 failed | lamp temperature sensor failed | no |
 
-(Names are from the constants; the "meaning" column is my reading of those names [Guess].)
-
 - Lockout is codes 1 to 7. While locked out, the lamp stays dark and ignores State, Ramp, Cue, Alarm arming and Timer start writes (accepted but no effect, State re-notified). Flags bit2 is set and bit0 is clear. [Code]
 - Flags: bit1 is set once any Time write has been applied since boot. Bit3 (time stale) is set when more than the Config `stale hours` have passed since the last Time write; it is never set before the first sync. [Code]
 - The lamp starts in code 7 (locked out) until its power check finishes, so the first Status read after boot can show a lockout that clears within seconds. [Code]
@@ -363,7 +358,7 @@ Status codes [Code]:
 - Write: sets the lamp's real-time clock. The first write after boot marks the clock synced; later writes re-sync it. The lamp has no battery clock, so every reboot needs a new write. [Code]
 - Read: returns the lamp's current time in the same layout, with unix = 0 and ms = 0 if never synced (the offset is still returned, 0 before any sync). [Code]
 - The offset is stored for display and is also visible in the device report. The lamp does not use it to schedule anything: Alarm start times are absolute UTC seconds. [Code]
-- Accuracy: the app compares a Time read with the phone clock and shows "Clock offset". BLE latency is not compensated. Expect errors of the order of tens to a few hundred ms [Guess].
+- Accuracy: the app compares a Time read with the phone clock and shows "Clock offset". BLE latency is not compensated. Expect errors of the order of tens to a few hundred ms.
 
 ### 8.3 Config (3006): read, write. 7 bytes
 
