@@ -69,21 +69,9 @@ The lamp is a BLE peripheral. It advertises as `OKK Lamp` and offers three small
 - **Monitoring:** an INA3221 measures the supply input and the 5 V rail, a BME280 reads temperature and humidity inside the base, and a DS18B20 reads the lamp's temperature.
 - **Controls:** a rotary encoder with a push switch, and a small indicator LED.
 
-## Building it
-
-- `src/`: the lamp firmware (Toit). Install it on the ESP32 with
-  [Jaguar](https://github.com/toitlang/jaguar), for example
-  `jag run -d <device> src/project-clock-2.toit`.
-- `test/`: Toit tests that run on a computer, for example
-  `jag run -d host test/test-lamp-protocol.toit`.
-- `android/`: the Kotlin and Jetpack Compose app. It needs JDK 17. Build it with
-  `./gradlew test` and `./gradlew assembleDebug`, then install the APK. It needs Android 8
-  or later; choosing a language inside the app needs Android 13 or later.
-- `docs/ble-gatt-spec.md`: the full protocol, including open questions and the test plan.
-
 ## Where it stands
 
-The Sleep as Android events are still being figured out.  The next-alarm reading and the first versions of the app have been tried on real hardware and function well. Newer parts are still being developed.
+The Sleep as Android events are still being figured out.  The next-alarm reading and the first versions of the app have been tried on real hardware and function well. Newer parts are still being developed.  Once v1.0 is finished, source code for the app and the code for the ESP32 will live here.
 
 ## Modules used in this build.
 
