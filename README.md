@@ -88,6 +88,11 @@ The first version was built around MQTT to talk to Sleep as Android, and explore
 - [MPR121](https://github.com/milkmansson/toit-mpr121) when the device was intended to have touch sensors, not a rotary encoder.
 - [Sleep as Android integration](https://github.com/milkmansson/toit-sleep-as-android) (over MQTT).
 - [47L16 EERAM](https://github.com/milkmansson/toit-eeram) to store interim data when the device had an RTC, needed to manage timezones, and other information.
+- Using an [SSD1306](https://github.com/toitware/toit-ssd1306) to display information, implement a [display manager]() which switches between pages on the display.
+- Alternatives were used for some, as earlier physical builds worked somewhat differently (such as [ENS160](https://github.com/milkmansson/toit-ens16x)) and
+adapt test [AHT20](https://github.com/davidlao2k/aht20-driver) for the AHT21.
+- Use a [DS3231](https://github.com/pkarsy/toit-ds3231) to keep time after power off events.  Many DS3231's have a small flash chip onboard ([cat24c32](https://github.com/toitware/toit-cat24c32)) where information (such as the timezone) could be stored.  Implement a PR for DS3231 Alarm capabilities.
+- Get time from GPS instead of internet - leading to a lot of work on various GNSS chipsets and a universal GNSS driver for Toit.
 
 ## Not done yet
 
