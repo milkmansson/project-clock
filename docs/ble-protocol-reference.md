@@ -55,7 +55,7 @@ Base: `b45f<slot>-4423-4e5d-a885-2418d6adf470`, where `<slot>` is four hex digit
 "Enc" means the characteristic requires an encrypted (bonded) link; the first access triggers pairing. [Code: permissions are READ-ENCRYPTED / WRITE-ENCRYPTED]
 
 | Characteristic | Slot | Read | Write | Notify | Needs encryption | Size (bytes) |
-|---|---|---|---|---|---|
+|---|---|---|---|---|---|---|
 | State | `1001` | yes | yes | yes | read and write | 5 |
 | Ramp | `1002` | no | yes | no | write | 7 |
 | Cue | `1003` | no | yes | no | write | 6 |
