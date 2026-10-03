@@ -1,90 +1,112 @@
-# Project: Clock
-A bedside clock project, featuring CCT LED strip to assist with waking, and
-other features.
+# Project Clock ("OKK Lamp" v002)
 
-> [!INFORMATION]
-> ### Project Status
-> 12 Feb 26: Project going slowly whilst I'm travelling without my development tools and
-> hardware being available.
+A bedside lamp that helps the user wake up and wind down.  Controlled via phone using Bluetooth Low Energy (BLE).  Built originally for people who live with only little daylight in the depths of winter.  White temperature tuning to have warm light in the evening, blue light in the morning, and a ramp up of light at wake up.  No LEDs or other lights to keep the user awake in the evening.
 
-## Mission
-Create a bedside lamp that could have a white light at the right temperatures
-(cool/warm) to assist with waking and sleeping, especially for someone who lives
-with very little daylight in the depth of wintertime.
-- Allow on/off/light temperature control of a CCT LED strip.
-- Allow interaction with the clock to send a message to the phone and tell it to snooze an alarm.
-- Implement a sleep function, to keep the light on.  Fade the light or turn off when the user drifts off to sleep.
-- Use a sensor to determine if someone is there..  allow alarms to be disabled/
-muted alarms if nobody is nearby.
-- Using a strip of NEOPIXEL LED's, implement a basic dot-matrix style display
-such that basic information like time can be shown on the lampshade.
-- Prove that current commercially available products of this nature are over priced, under developed and under featured, whilst giving the power and flexibility to users to make a device to suit their use cases.
+The electronics of this prototype live inside the base of an off-the-shelf table lamp with a linen shade (the original electronics were removed).  The lamp has a ESP32 microcontroller, programmed in [Toit](https://toit.io).  The lamp operates independently, whilst the project also has an app for giving time and alarm information to the device.
 
-**Extra Ideas**
-- Get time information from Internet.
-- Get time information from GPS.
+## What it does
 
-### Completed Features (aka. Side Missions)
-- Implement an event handler to take alarm clock events from a phone alarm clock
-  application.
-  - Write an MQTT wrapper to support the [Sleep-as-android](https://github.com/milkmansson/toit-sleep-as-android) app.
-  - Implement any smart alerts/features/capabilities from the app such as
-  gradual fade up of lights, actions for snoring detection, etc.
-- Use [NTP](https://github.com/toitlang/pkg-ntp) to get Time from the internet.
-- Use calls to the internet to determine location information (GeoIP lookup).
-  Use this information to determine outside weather/temperature information for
-  display to the user. (Using Toit packages
-  [encoding.json](https://libs.toit.io/encoding/json/library-summary),
-  [net](https://libs.toit.io/net/library-summary),
-  [http](https://github.com/toitlang/pkg-http) and
-  [certificate-roots](https://github.com/toitware/toit-cert-roots).)
-- Implement [INA226](https://github.com/milkmansson/toit-ina226) and
-  [INA3221](https://github.com/milkmansson/toit-ina3221) to measure current and
-  throughput to determine if operating within design tolerances.
-- Implement [HUSB238](https://github.com/milkmansson/toit-husb238) - USB-C PD
-  trigger to try and get the best wattage out of the available power supplies.
-  Use information from the device to take action to prevent LED power draw
-  from browning out the whole system if/when a non-PD capable charger (or simply, insufficient power) is available.
-- Implement [47L16](https://github.com/milkmansson/toit-eeram) flash-backed
-  EERAM chip to save information and other settings, to be persistent across
-  reboots.  This would be more easily possible using Toit storage [Buckets](https://libs.toit.io/system/storage/library-summary) but I was worried about causing wear on ESP32 onboard flash, and had some of these available from another project.
-- Implement two [PWM](https://docs.toit.io/tutorials/hardware/pwm-led) drivers
-  to control the CCT strip.  Implement a [library] to perform basic control of
-  white balance, and include gamma correction.
-- Implement a touch sensor [MPR121](https://github.com/milkmansson/toit-mpr121)
-  to use as buttons to control the device.  Implement the proximity sensor
-  feature to help as a snooze button to ensure the user is not annoyed by
-  hitting the wrong sensor when an alarm happens.
-- Using a pin interrupt, implement an event handler for the
-  [MPR121](https://github.com/milkmansson/toit-mpr121) to assign code for execution
-  when assigned touch channels are triggered.
-- Using an [SSD1306](https://github.com/toitware/toit-ssd1306) to display
-  information, implement a [display manager](./src/toit-clock-screen.toit) which
-  switches between pages on the display.
-- Use a [BME280](https://github.com/toitware/bme280-driver) to get basic
-  environmental information for display to the user.  Potentially do some logging
-  to the internet for assistance in assessing the sleep environment.  Implement alternatives such as [ENS160](https://github.com/milkmansson/toit-ens16x) and
-  adapt test [AHT20](https://github.com/davidlao2k/aht20-driver) for the AHT21.
-- Use a [DS3231](https://github.com/pkarsy/toit-ds3231) to keep time after power
-  off events.  Use the [cat24c32](https://github.com/toitware/toit-cat24c32)
-  driver to store information (such as the timezone) on the small flash module
-  common to many DS3231 modules.  Implement a PR for DS3231 Alarm capabilities.
+### The physical lamp
 
+- **Light:** on and off, brightness, and colour temperature from warm (3000 K) to cool (6000 K). Use the phone or the knob on the base.
+- **Wake-up light (sunrise):** the light fades up over 1 to 60 minutes and reaches its final brightness and colour temperature at the preferred wake-up time. It can switch itself off after a set time, or stay on.
+- **Looks after itself:** has a three channel sensor to measure voltage and current, a sensor for the temperature of the base and separately, of the LED strip/lamp part, and humidity in the base.
+- **Consumed USB-C PD power:** as a sink device - if the USB-C supply cannot give the 12 V the LED strip needs, the lamp keeps its light output off and is able to inform the user via the app instead of browning out.
+- **A small LED on the base:** dark when the lamp is quiet (a flashing LED could keep the user awake), very faint while an alarm is set, and flashing only to report a fault.
+- **A physical knob:** (a rotary encoder with a push switch) with the following actions:
 
-#### Incomplete side missions:
-- Implement BT/BLE capabilities:
-  - Allow arbitrary sensor data to become available to phone apps.
-  - Allow configuration, eg, WiFi credentials, via BT/BLE, to prevent needing
-    to mess with code in order to attach to a new WiFi AP.
-- Use a GPS to get the system time.  Potentially use this information to help
-  with determining location for better weather information (especially if GEOIP
-  data is not accurate enough).
-  - There are several projects related to this, including this Toit [NMEA Message Parser](https://github.com/milkmansson/toit-nmea-message),
-  and/or Toit's [uBlox GNSS driver](https://github.com/toitware/ublox-gnss-driver)).
-  - For time sync, refine the method to abstract technicalities like Timing Pins
-  etc away from users, or for where cheaper modules without timing pins are used.
-- Implement an [MQ2] sensor/smoke detector.  Fires aren't
-  expected but for the size of the sensor, and the existence of alarm
-  capability, why wouldn't we?
-- Package everything together such that a user could build one of these from start to finish.
-- Find alternative method for Apple devotees, as Apple don't appear to like MQTT.
+| Action | Result |
+|---|---|
+| Turn | Brightness up or down in 5 % steps |
+| Press | Lamp on or off |
+| Hold for 3 s | Switch the knob from changing brightness to changing the colour temperature |
+| Hold for more than 10 s | Open a 5 minute window in which a new phone can pair or reconnect |
+
+### The Android app (so far)** (`android/`)
+
+| Action | Result |
+|---|---|
+| Finds the lamp, pairs with it and reconnects by itself. An optional background service keeps it connected overnight. | ![Pairing](./assets/pairing.jpeg) |
+| **Follows the phone's next alarm:** the sunrise is timed from whatever alarm the phone will ring next (via Sleep as Android, or any other alarm app).  If the alarm is closer than the sunrise length, the sunrise is skipped. | ![Next Alarm](./assets/next-alarm.jpeg) |
+| **Reading timer:** the lamp stays on for 5 to 90 minutes, then fades out over a minute.   Switching the lamp off ends it early. You can still change the brightness meanwhile.<br><br>**Quick actions:** a 10 minute sunrise, a triple flash, and a dim nightlight. | ![Light Control Card](./assets/light.jpeg) |
+| As well as cards for light controls and the wake-up light/reading timer,  live **sensor** gauges for voltage, and five-minute trend charts. The supply gauges mark the negotiated USB-C power contract. <br><br> This prototype had two power rails, 12v for the LEDs, and a boost/buck device ensuring 5v for the ESP32. | ![Sensor Card](./assets/sensors.jpeg) |
+| For troubleshooting, a **Device** card (software versions, memory, the lamp's clock) and a **Lamp log**, both with a button to copy the text out. | ![Device Card](./assets/device.jpeg) |
+| A troubleshooting option to shows the intents/broadcasts sent out by Sleep as Android (alarm, snooze, tracking started and stopped).  This is solely as a debugging aid. | ![Intents Card](./assets/light.jpeg) |
+| Interface in English, Swedish, Finnish and German (for now). It follows the phone's language, falls back to English, and has a card for choosing a language by hand. | ![Language Card](./assets/language.jpeg)
+
+## Sleep as Android
+
+- The app will recieve intents from the *Sleep as Android app*, and act on those.
+- [If allowed] - the device will also take control directly from the *Sleep as Android* app without the app included in this repository.
+
+> [!CAUTION]
+> **Not 100% decided:** The app does not need *Sleep as Android* to run the lamp, but it is intended to be a 100% compatible companion device to this app.  Turn on Sleep's **Intent API** setting and the app hears when an alarm is rescheduled or snoozed, and gives the required information to the Lamp.  Once the Lamp has that information, the **lamp** can start the sunrise independently of the phone using its own internal clock - in this way a dropped Bluetooth link overnight still allows the light ramp up to function.
+
+## How BLE is used
+
+The lamp is a BLE peripheral. It advertises as `OKK Lamp` and offers three small services, all described in [`docs/ble-gatt-spec.md`](docs/ble-gatt-spec.md):
+
+| Service | What it carries |
+|---|---|
+| **Lamp** | Light state, ramps (sunrise), cues (flash, nightlight), the wake-up alarm plan and the reading timer |
+| **Sensor** | Live readings, and a short history kept in the lamp's memory |
+| **System** | Status and fault code, time sync, device info, log lines and settings |
+
+### Notes:
+
+- The phone is the BLE central and scans for the Lamp service's UUID. No Wi-Fi, account or cloud is involved, and, whilst capable, the lamp does not need the internet.
+- Every message is a small fixed-size packet (at most 20 bytes, little-endian), so it fits the default Bluetooth packet size.
+- Pairing is "Just Works" bonding. Reading the status and device info works without pairing; controlling the lamp needs it.
+- The lamp has no real-time clock. The phone sets the lamp's clock when it connects.
+- The lamp advertises for 5 minutes after it boots, or after the knob is held for more than 10 seconds, and stays discoverable while an alarm is set so the phone can reconnect overnight. One phone is connected at a time.
+- The wake-up plan lives in the lamp's memory only. The app writes it again whenever it connects, so a power cut does not lose it for good.
+
+## Hardware (This Build)
+
+- **Controller:** DFRobot Beetle ESP32-C6, running Toit.
+- **Light:** a two-channel (warm 3000 K and cool 6000 K) white LED strip driven by PWM.  There is currently no red channel, so no red nightlight.
+- **Power:** USB-C Power Delivery, negotiated by a HUSB238 trigger module to negotiate for 12v.
+- **Monitoring:** an INA3221 measures the supply input and the 5 V rail, a BME280 reads temperature and humidity inside the base, and a DS18B20 reads the lamp's temperature.
+- **Controls:** a rotary encoder with a push switch, and a small indicator LED.
+
+## Building it
+
+- `src/`: the lamp firmware (Toit). Install it on the ESP32 with
+  [Jaguar](https://github.com/toitlang/jaguar), for example
+  `jag run -d <device> src/project-clock-2.toit`.
+- `test/`: Toit tests that run on a computer, for example
+  `jag run -d host test/test-lamp-protocol.toit`.
+- `android/`: the Kotlin and Jetpack Compose app. It needs JDK 17. Build it with
+  `./gradlew test` and `./gradlew assembleDebug`, then install the APK. It needs Android 8
+  or later; choosing a language inside the app needs Android 13 or later.
+- `docs/ble-gatt-spec.md`: the full protocol, including open questions and the test plan.
+
+## Where it stands
+
+The Sleep as Android events are still being figured out.  The next-alarm reading and the first versions of the app have been tried on real hardware and function well. Newer parts are still being developed.
+
+## Modules used in this build.
+
+- [INA3221](https://github.com/milkmansson/toit-ina3221) 3 channel (or [INA226](https://github.com/milkmansson/toit-ina226) - 1 channel) current monitor.
+- [HUSB238](https://github.com/milkmansson/toit-husb238) USB-C PD trigger.
+- [BME280](https://github.com/toit-pkg/toit-bmx280) as an internal temperature sensor.
+- [DS18b20](https://github.com/toitware/toit-ds18b20) as a temperature sensor for the LED strip.
+- [Rotary Encoder](https://github.com/milkmansson/toit-rotary-encoder) library managing debouncing and lambdas for rotary encoders.
+
+## Earlier versions and side missions
+
+The first version was built around MQTT to talk to Sleep as Android, and explored a touch sensor, a small display, a real-time clock and GPS time. The phone app and BLE made most of that unnecessary, and this version no longer uses them.  Several of Toit libraries were used, as well as some libraries written whilst on the journey to this device.  All are available at [https://pkg.toit.io](https://pkg.toit.io).
+
+- [MPR121](https://github.com/milkmansson/toit-mpr121) when the device was intended to have touch sensors, not a rotary encoder.
+- [Sleep as Android integration](https://github.com/milkmansson/toit-sleep-as-android) (over MQTT).
+- [47L16 EERAM](https://github.com/milkmansson/toit-eeram) to store interim data when the device had an RTC, needed to manage timezones, and other information.
+
+## Not done yet
+
+- Keeping other people's phones out: today anyone in Bluetooth range can pair during the open window. Per-phone keys are designed in the spec but not built.
+- A button on the phone's lock screen for a soft night light, for trips to the bathroom.
+- Over-temperature protection (a baseline of real temperature data is still required).
+- A screen in the app for the history the lamp keeps.
+- Snoozing an alarm from the lamp, and switching alarms off when nobody is near it.
+- An iPhone app.
+- Packaging everything so that someone else can build one from start to finish.
