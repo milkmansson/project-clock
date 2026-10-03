@@ -28,7 +28,7 @@ The electronics of this prototype live inside the base of an off-the-shelf table
 
 | Feature | Image |
 |---|---|
-| Finds the lamp, pairs with it and reconnects by itself. An optional background service keeps it connected overnight. | ![Pairing](./assets/pairing.jpeg) |
+| Finds the lamp, pairs with it and reconnects by itself. An optional background service keeps it connected. | ![Pairing](./assets/pairing.jpeg) |
 | **Follows the phone's next alarm:** the sunrise is timed from whatever alarm the phone will ring next (via Sleep as Android, or any other alarm app).  If the alarm is closer than the sunrise length, the sunrise is skipped. | ![Next Alarm](./assets/next-alarm.jpeg) |
 | **Reading timer:** the lamp stays on for 5 to 90 minutes, then fades out over a minute.   Switching the lamp off ends it early. You can still change the brightness meanwhile.<br><br>**Quick actions:** a 10 minute sunrise, a triple flash, and a dim nightlight. | ![Light Control Card](./assets/light.jpeg) |
 | As well as cards for light controls and the wake-up light/reading timer,  live **sensor** gauges for voltage, and five-minute trend charts. The supply gauges mark the negotiated USB-C power contract. <br><br> This prototype had two power rails, 12v for the LEDs, and a boost/buck device ensuring 5v for the ESP32. | ![Sensor Card](./assets/sensors.jpeg) |
