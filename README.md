@@ -22,9 +22,9 @@ The electronics of this prototype live inside the base of an off-the-shelf table
 | Hold for 3 s | Switch the knob from changing brightness to changing the colour temperature |
 | Hold for more than 10 s | Open a 5 minute window in which a new phone can pair or reconnect |
 
-### The Android app (so far)** (`android/`)
+### The Android app (so far)
 
-| Action | Result |
+| Feature | Image |
 |---|---|
 | Finds the lamp, pairs with it and reconnects by itself. An optional background service keeps it connected overnight. | ![Pairing](./assets/pairing.jpeg) |
 | **Follows the phone's next alarm:** the sunrise is timed from whatever alarm the phone will ring next (via Sleep as Android, or any other alarm app).  If the alarm is closer than the sunrise length, the sunrise is skipped. | ![Next Alarm](./assets/next-alarm.jpeg) |
