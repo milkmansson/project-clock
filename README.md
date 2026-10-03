@@ -2,7 +2,7 @@
 
 A bedside lamp that helps the user wake up and wind down.  Controlled via phone using Bluetooth Low Energy (BLE).  Built originally for people who live with only little daylight in the depths of winter.  White temperature tuning to have warm light in the evening, blue light in the morning, and a ramp up of light at wake up.  No LEDs or other lights to keep the user awake in the evening.
 
-The electronics of this prototype live inside the base of an off-the-shelf table lamp with a linen shade (the original electronics were removed).  The lamp has a ESP32 microcontroller, programmed in [Toit](https://toit.io).  The lamp operates independently, whilst the project also has an app for giving time and alarm information to the device.
+The electronics of this prototype live inside the base of an off-the-shelf table lamp with a linen shade (the original electronics were removed).  The lamp has a ESP32 microcontroller, programmed in [Toit](https://toit.io).  The lamp operates independently as any bedside lamp would, whilst having functionality provided via BLE (by apps) for giving time and alarm information to the device.
 
 ## What it does
 
