@@ -36,7 +36,7 @@ The electronics of this prototype live inside the base of an off-the-shelf table
 | **Reading timer:** the lamp stays on for 5 to 90 minutes, then fades out over a minute.   Switching the lamp off ends it early. You can still change the brightness meanwhile.<br><br>**Quick actions:** a 10 minute sunrise, a triple flash, and a dim nightlight. | ![Light Control Card](./assets/light.jpeg) |
 | As well as cards for light controls and the wake-up light/reading timer,  live **sensor** gauges for voltage, and five-minute trend charts. The supply gauges mark the negotiated USB-C power contract. <br><br> This prototype had two power rails, 12v for the LEDs, and a boost/buck device ensuring 5v for the ESP32. | ![Sensor Card](./assets/sensors.jpeg) |
 | For troubleshooting, a **Device** card (software versions, memory, the lamp's clock) and a **Lamp log**, both with a button to copy the text out. | ![Device Card](./assets/device.jpeg) |
-| A troubleshooting option to shows the intents/broadcasts sent out by Sleep as Android (alarm, snooze, tracking started and stopped).  This is solely as a debugging aid. | ![Intents Card](./assets/light.jpeg) |
+| A troubleshooting option to shows the intents/broadcasts sent out by Sleep as Android (alarm, snooze, tracking started and stopped).  This is solely as a debugging aid. | ![Intents Card](./assets/sleep-as-android-intents.jpeg) |
 | Interface in English, Swedish, Finnish and German (for now). It follows the phone's language, falls back to English, and has a card for choosing a language by hand. | ![Language Card](./assets/language.jpeg)
 
 ## Sleep as Android
