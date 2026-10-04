@@ -26,6 +26,9 @@ The electronics of this prototype live inside the base of an off-the-shelf table
 
 ### The Android app (so far)
 
+> [!TIP]
+> [Download it](./android/).  (Entire source code tree will be in the repo with version 1 release.)
+
 | Feature | Image |
 |---|---|
 | Finds the lamp, pairs with it and reconnects by itself. An optional background service keeps it connected. | ![Pairing](./assets/pairing.jpeg) |
