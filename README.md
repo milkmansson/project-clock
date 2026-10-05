@@ -1,6 +1,6 @@
 # Project Clock ("OKK Lamp" v002)
 
-A bedside lamp that helps the user wake up and wind down.  Controlled via phone using Bluetooth Low Energy (BLE).  Built originally for people who live with only little daylight in the depths of winter.  White temperature tuning to have warm light in the evening, blue light in the morning, and a ramp up of light at wake up.  No LEDs or other lights to keep the user awake in the evening.
+A bedside lamp that helps the user wake up and wind down.  Controlled via phone using Bluetooth Low Energy (BLE).  Built originally for people who live with only little daylight in the depths of winter.  White temperature tuning to have warm light in the evening, blue light in the morning, and a ramp up of light at wake up.  Attention to distractions (like status LEDs or other lights) which may keep a user awake at night.
 
 ![The Physial Lamp](./assets/lamp.jpeg)
 
